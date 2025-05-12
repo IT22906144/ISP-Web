@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Access Token</title>
+
+  <!-- Link to external CSS for styling -->
+  <link rel="stylesheet" href="style.css">
+
+  <script>
+    // Use to store the randomly generated token
+    let generatedToken = "";
+
+    // Function to randomly select one token
+    function getRandomToken() {
+      const tokens = [
+        'TOKEN-786G-SECURE-2025',
+        'TOKEN-942X-VAULT-2025',
+        'TOKEN-321L-LOCKED-2025',
+        'TOKEN-159Q-SAFEZONE-2025'
+      ];
+      const randomIndex = Math.floor(Math.random() * tokens.length);
+      return tokens[randomIndex];
+    }
+
+    // This function runs when the page loads
+    window.onload = function () {
+      // Generate a token and display it on the page
+      generatedToken = getRandomToken();
+      document.getElementById('tokenDisplay').textContent = generatedToken;
+    };
+
+    // Token validation functiion
+    function validateToken(event) {
+      event.preventDefault(); // Stop the form from submitting and refreshing the page
+
+      // Get the token input by the user
+      const userInput = document.getElementById('userToken').value.trim();
+
+      // Get the result display element
+      const result = document.getElementById('result');
+
+      // Check if user input matches the generated token
+      if (userInput === generatedToken) {
+        result.textContent = "Access Granted ✅";  
+        result.style.color = "green";
+      } else {
+        result.textContent = "Access Denied ❌";   
+        result.style.color = "red";
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h2>Your Token</h2>
+
+    <!-- Display the randomly generated token -->
+    <p id="tokenDisplay" class="token"></p>
+
+    <!-- Form where user enters the token they received -->
+    <form onsubmit="validateToken(event)">
+      <label for="userToken">Enter Token:</label><br>
+      <input type="text" id="userToken" required><br><br>
+      <button type="submit">Submit</button>
+    </form>
+
+    <!-- Shows the result of validation -->
+    <p id="result" class="result"></p>
+  </div>
+</body>
+</html>
