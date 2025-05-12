@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel - Secure Auth</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+  <div class="max-w-5xl mx-auto bg-[#10e8f1] shadow-2xl rounded-xl p-8 text-black">
+    <h2 class="text-3xl font-bold text-center text-blue-900 mb-6">🔐 Admin Panel - Add & Manage Users</h2>
+
+    <!-- Add New User Form -->
+    <form id="addUserForm" class="space-y-4 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input id="name" type="text" placeholder="Full Name" required class="border px-4 py-2 rounded-lg w-full bg-white" />
+        <input id="phone" type="tel" placeholder="Phone Number" required class="border px-4 py-2 rounded-lg w-full bg-white" />
+        <input id="email" type="email" placeholder="Email Address" required class="border px-4 py-2 rounded-lg w-full bg-white" />
+        <input id="empId" type="text" placeholder="Employee ID" required class="border px-4 py-2 rounded-lg w-full bg-white" />
+        <input id="password" type="password" placeholder="Password" required class="border px-4 py-2 rounded-lg w-full bg-white" />
+        <input id="repassword" type="password" placeholder="Confirm Password" required class="border px-4 py-2 rounded-lg w-full bg-white" />
+        <select id="type" required class="border px-4 py-2 rounded-lg w-full bg-white">
+          <option value="" disabled selected>Select User Type</option>
+          <option value="admin">Admin</option>
+          <option value="user">User</option>
+        </select>
+      </div>
+
+      <button type="submit"
+              class="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-6 py-2 rounded-lg w-full md:w-auto mt-4">
+        ➕ Add User
+      </button>
+    </form>
+
+    <!-- Alert -->
+    <div id="alert" class="hidden text-center font-medium mt-4"></div>
+
+    <!-- User Table -->
+    <div>
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold">All Registered Users</h3>
+        <button onclick="fetchUsers()"
+                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium">
+          🔄 Refresh
+        </button>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="table-auto w-full border border-gray-300 rounded-lg overflow-hidden">
+          <thead class="bg-gray-200">
+            <tr>
+              <th class="px-4 py-2 text-left">Name</th>
+              <th class="px-4 py-2 text-left">Email</th>
+              <th class="px-4 py-2 text-left">Phone</th>
+              <th class="px-4 py-2 text-left">Emp ID</th>
+              <th class="px-4 py-2 text-left">Type</th>
+            </tr>
+          </thead>
+          <tbody id="userTable" class="bg-white"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  const form = document.getElementById('addUserForm');
+  const alertBox = document.getElementById('alert');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('name').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const repassword = document.getElementById('repassword').value;
+    const type = document.getElementById('type').value;
+    const empId = document.getElementById('empId').value.trim();
+
+    const passwordRegex = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[\W_]).{8,}$/;
+
+    if (password !== repassword) {
+      return showAlert("❌ Passwords do not match!", "black");
+    }
+
+    if (!passwordRegex.test(password)) {
+      return showAlert("❌ Password must be at least 8 characters, include uppercase, lowercase, digit, and special character.", "black");
+    }
+
+    const res = await fetch('/admin/add-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, phone, email, password, type, empId })
+    });
+
+    const msg = await res.text();
+
+    if (res.ok) {
+      showAlert("✅ " + msg, "green");
+      form.reset();
+      fetchUsers();
+    } else {
+      showAlert("❌ " + msg, "black");
+    }
+  });
+
+  async function fetchUsers() {
+    const res = await fetch('/admin/users');
+    const users = await res.json();
+    const tableBody = document.getElementById('userTable');
+    tableBody.innerHTML = '';
+
+    users.forEach(user => {
+      const row = `
+        <tr class="border-b hover:bg-gray-50">
+          <td class="px-4 py-2">${user.name}</td>
+          <td class="px-4 py-2">${user.email}</td>
+          <td class="px-4 py-2">${user.phone}</td>
+          <td class="px-4 py-2">${user.empId}</td>
+          <td class="px-4 py-2 capitalize">${user.type}</td>
+        </tr>`;
+      tableBody.innerHTML += row;
+    });
+  }
+
+  function showAlert(message, color) {
+    alertBox.textContent = message;
+    alertBox.className = text-${color} bg-${color === 'black' ? 'yellow-100' : color + '-100'} border border-${color === 'black' ? 'yellow-400' : color + '-300'} p-3 rounded-lg mt-4;
+    alertBox.classList.remove('hidden');
+    setTimeout(() => alertBox.classList.add('hidden'), 4000);
+  }
+
+  window.onload = fetchUsers;
+</script>
+
+</body>
+</html>
