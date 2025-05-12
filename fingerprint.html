@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fingerprint Authentication</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Biometric Authentication</h2>
+    <p>Please use your fingerprint or device biometric</p>
+    <button onclick="authenticate()">Authenticate</button>
+  </div>
+
+  <script>
+    async function authenticate() {
+      if (!window.PublicKeyCredential) {
+        alert("WebAuthn not supported by your browser or device.");
+        return;
+      }
+
+      try {
+        const assertion = await navigator.credentials.get({
+          publicKey: {
+            challenge: Uint8Array.from('random-challenge-string', c => c.charCodeAt(0)),
+            timeout: 60000,
+            userVerification: 'required',
+          }
+        });
+
+        // You can verify this assertion server-side. For now, simulate success.
+        alert("Fingerprint authentication successful!");
+        window.location.href = 'token.html';
+
+      } catch (err) {
+        console.error(err);
+        alert("Authentication failed or was canceled.");
+      }
+    }
+  </script>
+</body>
+</html>
