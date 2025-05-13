@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="/assets/css/style.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>User Registration</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
   <div class="w-full max-w-2xl bg-white rounded-xl shadow-md p-6">
     <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">👤 Create New User</h2>
@@ -18,7 +19,7 @@
         <input type="text" id="empId" placeholder="Employee ID*" required class="input" />
         <input type="tel" id="phone" placeholder="Phone*" required class="input" />
         <input type="email" id="email" placeholder="Email*" required class="input" />
-        <input type="date" id="dob" placeholder="DOB*" required class="input" />
+        <input type="date" id="dob" required class="input" />
         <select id="gender" required class="input">
           <option value="">Gender*</option>
           <option value="male">Male</option>
@@ -37,7 +38,7 @@
         </button>
       </div>
       <input type="hidden" id="fingerprintData" />
-      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700" onclick="location.href='adminask.html'">
         Create User
       </button>
       <div id="formAlert" class="hidden p-3 rounded text-sm"></div>
@@ -67,7 +68,7 @@
           document.getElementById("registerFingerprint").innerText = "🟢 Fingerprint Registered";
         }
       } catch (error) {
-        alert("Fingerprint registration failed. Please use a device with fingerprint authentication.");
+        alert("Fingerprint registration failed.");
       }
     });
 
@@ -82,30 +83,35 @@
       }
 
       const data = {
-        fullName: fullName.value,
-        username: username.value,
-        nic: nic.value,
-        empId: empId.value,
-        phone: phone.value,
-        email: email.value,
-        dob: dob.value,
-        gender: gender.value,
+        fullName: document.getElementById("fullName").value,
+        username: document.getElementById("username").value,
+        nic: document.getElementById("nic").value,
+        empId: document.getElementById("empId").value,
+        phone: document.getElementById("phone").value,
+        email: document.getElementById("email").value,
+        dob: document.getElementById("dob").value,
+        gender: document.getElementById("gender").value,
         password: password,
-        userType: userType.value,
+        userType: document.getElementById("userType").value,
         fingerprintData: document.getElementById("fingerprintData").value
       };
 
-      const res = await fetch("/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
+      try {
+        const res = await fetch("/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
 
-      const result = await res.json();
-      if (res.ok) {
-        window.location.href = "adminask.html";
-      } else {
-        alert(result.message || "Registration failed.");
+        const result = await res.json();
+        if (res.ok) {
+          window.location.href = "adminask.html";
+        } else {
+          alert(result.message || "Registration failed.");
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Network error or server not running.");
       }
     });
   </script>
