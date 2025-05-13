@@ -1,131 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <link rel="stylesheet" href="style.css">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>User Registration</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .fingerprint-btn:hover {
-      background-color: #f0f0f0;
-    }
-    .fingerprint-registered {
-      background-color: #e6ffed;
-      border-color: #38a169;
-    }
-  </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
-  <div class="w-full max-w-md bg-white rounded-xl shadow-md p-6">
+  <div class="w-full max-w-2xl bg-white rounded-xl shadow-md p-6">
     <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">👤 Create New User</h2>
-    
     <form id="userForm" class="space-y-4">
-      <!-- Row 1 -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Full Name*</label>
-          <input type="text" id="fullName" required 
-                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Username*</label>
-          <input type="text" id="username" required 
-                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
-        </div>
+        <input type="text" id="fullName" placeholder="Full Name*" required class="input" />
+        <input type="text" id="username" placeholder="Username*" required class="input" />
+        <input type="text" id="nic" placeholder="NIC*" required class="input" />
+        <input type="text" id="empId" placeholder="Employee ID*" required class="input" />
+        <input type="tel" id="phone" placeholder="Phone*" required class="input" />
+        <input type="email" id="email" placeholder="Email*" required class="input" />
+        <input type="date" id="dob" placeholder="DOB*" required class="input" />
+        <select id="gender" required class="input">
+          <option value="">Gender*</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Other</option>
+        </select>
+        <input type="password" id="password" placeholder="Password*" required class="input" />
+        <input type="password" id="confirmPassword" placeholder="Confirm Password*" required class="input" />
+        <select id="userType" required class="input">
+          <option value="">User Type*</option>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
+        <button type="button" id="registerFingerprint" class="input bg-gray-200 text-left">
+          🖐️ Register Fingerprint
+        </button>
       </div>
-
-      <!-- Row 2 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">NIC*</label>
-          <input type="text" id="nic" required 
-                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Employee ID*</label>
-          <input type="text" id="empId" required 
-                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
-        </div>
-      </div>
-
-      <!-- Row 3 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Phone*</label>
-          <input type="tel" id="phone" required 
-                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Email*</label>
-          <input type="email" id="email" required 
-                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
-        </div>
-      </div>
-
-      <!-- Row 4 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Date of Birth*</label>
-          <input type="date" id="dob" required 
-                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Gender*</label>
-          <select id="gender" required 
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
-            <option value="">Select</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- Row 5 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Password*</label>
-          <input type="password" id="password" required 
-                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Confirm Password*</label>
-          <input type="password" id="confirmPassword" required 
-                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
-        </div>
-      </div>
-
-      <!-- Row 6 -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">User Type*</label>
-          <select id="userType" required 
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
-            <option value="">Select</option>
-            <option value="user">User</option>
-            <option value="admin">Admin</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Fingerprint*</label>
-          <button type="button" id="registerFingerprint" 
-                  class="w-full px-3 py-2 border-2 border-dashed border-gray-300 rounded-md flex items-center justify-center gap-2 fingerprint-btn">
-            <span id="fingerprintIcon">🖐️</span>
-            <span id="fingerprintText">Register</span>
-          </button>
-        </div>
-      </div>
-
-      <button type="submit" 
-              class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <input type="hidden" id="fingerprintData" />
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
         Create User
       </button>
-
-      <div id="formAlert" class="hidden p-3 rounded-md text-sm"></div>
+      <div id="formAlert" class="hidden p-3 rounded text-sm"></div>
     </form>
   </div>
 
-  <script src="usercreation.js"></script>
+  <script>
+    document.getElementById("registerFingerprint").addEventListener("click", async () => {
+      try {
+        const publicKey = {
+          challenge: Uint8Array.from("randomChallenge", c => c.charCodeAt(0)),
+          rp: { name: "Secure Location App" },
+          user: {
+            id: Uint8Array.from("user_id_1234", c => c.charCodeAt(0)),
+            name: "user@example.com",
+            displayName: "User"
+          },
+          pubKeyCredParams: [{ alg: -7, type: "public-key" }],
+          authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" },
+          timeout: 60000,
+          attestation: "none"
+        };
+
+        const credential = await navigator.credentials.create({ publicKey });
+        if (credential) {
+          document.getElementById("fingerprintData").value = btoa(JSON.stringify(credential));
+          document.getElementById("registerFingerprint").innerText = "🟢 Fingerprint Registered";
+        }
+      } catch (error) {
+        alert("Fingerprint registration failed. Please use a device with fingerprint authentication.");
+      }
+    });
+
+    document.getElementById("userForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+      if (password !== confirmPassword) {
+        alert("Passwords do not match!");
+        return;
+      }
+
+      const data = {
+        fullName: fullName.value,
+        username: username.value,
+        nic: nic.value,
+        empId: empId.value,
+        phone: phone.value,
+        email: email.value,
+        dob: dob.value,
+        gender: gender.value,
+        password: password,
+        userType: userType.value,
+        fingerprintData: document.getElementById("fingerprintData").value
+      };
+
+      const res = await fetch("/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+      alert(result.message);
+    });
+  </script>
+
+  <style>
+    .input {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 0.375rem;
+    }
+  </style>
 </body>
 </html>
