@@ -17,8 +17,10 @@
   <script>
     function verifyOtp(e) {
       e.preventDefault();
-      const otp = document.getElementById('otp').value;
-      if (otp === '123456') {
+      const otp = document.getElementById('otp').value.trim();
+      const validOtps = ['467982', '968543', '740156', '782361', '231569', '246902'];
+
+      if (validOtps.includes(otp)) {
         alert('OTP verified!');
         window.location.href = 'fingerprint.html';
       } else {

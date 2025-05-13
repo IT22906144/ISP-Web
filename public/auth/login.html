@@ -7,27 +7,33 @@
 <body>
   <div class="container">
     <h2>Login</h2>
-    <form onsubmit="loginUser(event)">
+    <form id="loginForm">
       <input type="text" id="username" placeholder="Username" required><br>
       <input type="password" id="password" placeholder="Password" required><br>
-      <button type="submit">Login</button>
+      <button type="submit" onclick="location.href='otp.html'">Login</button>
     </form>
   </div>
 
   <script>
-    function loginUser(e) {
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
       e.preventDefault();
-      const user = document.getElementById('username').value;
-      const pass = document.getElementById('password').value;
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
 
-      // Simulate valid user check
-      if (user === 'admin' && pass === '1234') {
-        alert('Login successful!');
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        alert('OTP sent to your email!');
         window.location.href = 'otp.html';
       } else {
-        alert('Invalid credentials.');
+        alert(result.message);
       }
-    }
+    });
   </script>
 </body>
 </html>
