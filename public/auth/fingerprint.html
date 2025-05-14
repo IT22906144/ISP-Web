@@ -14,27 +14,58 @@
   <script>
     async function authenticate() {
       if (!window.PublicKeyCredential) {
-        alert("WebAuthn not supported by your browser or device.");
+        alert("WebAuthn not supported by your browser.");
         return;
       }
 
+      // Step 1: Fetch challenge from server
+      const challengeResponse = await fetch('/api/auth-challenge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: localStorage.getItem("username") }) // store username in login step
+      });
+      const publicKey = await challengeResponse.json();
+
       try {
-        const assertion = await navigator.credentials.get({
-          publicKey: {
-            challenge: Uint8Array.from('random-challenge-string', c => c.charCodeAt(0)),
-            timeout: 60000,
-            userVerification: 'required',
-          }
+        const credential = await navigator.credentials.get({ publicKey });
+
+        const assertionResponse = {
+          id: credential.id,
+          rawId: arrayBufferToBase64(credential.rawId),
+          response: {
+            authenticatorData: arrayBufferToBase64(credential.response.authenticatorData),
+            clientDataJSON: arrayBufferToBase64(credential.response.clientDataJSON),
+            signature: arrayBufferToBase64(credential.response.signature),
+            userHandle: credential.response.userHandle ? arrayBufferToBase64(credential.response.userHandle) : null,
+          },
+          type: credential.type,
+        };
+
+        // Step 2: Send assertion to server for verification
+        const verifyResponse = await fetch('/api/verify-auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: localStorage.getItem("username"),
+            assertion: assertionResponse
+          })
         });
 
-        // You can verify this assertion server-side. For now, simulate success.
-        alert("Fingerprint authentication successful!");
-        window.location.href = 'token.html';
-
+        const result = await verifyResponse.json();
+        if (result.success) {
+          alert("Authentication successful!");
+          window.location.href = 'token.html';
+        } else {
+          alert("Authentication failed.");
+        }
       } catch (err) {
         console.error(err);
-        alert("Authentication failed or was canceled.");
+        alert("Authentication error.");
       }
+    }
+
+    function arrayBufferToBase64(buffer) {
+      return btoa(String.fromCharCode(...new Uint8Array(buffer)));
     }
   </script>
 </body>

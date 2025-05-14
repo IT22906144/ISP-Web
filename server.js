@@ -27,7 +27,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// ✨ Login Endpoint with OTP sending
+// Login Endpoint with OTP sending
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -92,4 +92,58 @@ app.post('/api/verify-otp', (req, res) => {
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
+});
+
+const { generateAuthenticationOptions, verifyAuthenticationResponse } = require('@simplewebauthn/server');
+const base64url = require('base64url');
+
+const userAuthMap = new Map(); // store user credentials (temporary for demo)
+const challengeMap = new Map();
+
+// WebAuthn Challenge Endpoint
+app.post('/api/auth-challenge', async (req, res) => {
+  const { username } = req.body;
+
+  const options = generateAuthenticationOptions({
+    timeout: 60000,
+    userVerification: 'required',
+  });
+
+  challengeMap.set(username, options.challenge);
+  res.json(options);
+});
+
+// WebAuthn Verification Endpoint
+app.post('/api/verify-auth', async (req, res) => {
+  const { username, assertion } = req.body;
+  const expectedChallenge = challengeMap.get(username);
+  challengeMap.delete(username);
+
+  // You must retrieve the correct user's credential from the DB or memory.
+  const userCred = userAuthMap.get(username);
+  if (!userCred) return res.json({ success: false, message: 'No credential found for user' });
+
+  try {
+    const verification = await verifyAuthenticationResponse({
+      response: assertion,
+      expectedChallenge,
+      expectedOrigin: 'http://localhost:3000', // Change based on your domain
+      expectedRPID: 'localhost',
+      authenticator: {
+        credentialID: base64url.toBuffer(userCred.credentialID),
+        credentialPublicKey: base64url.toBuffer(userCred.credentialPublicKey),
+        counter: userCred.counter,
+      },
+    });
+
+    if (verification.verified) {
+      userCred.counter = verification.authenticationInfo.newCounter;
+      return res.json({ success: true });
+    } else {
+      return res.json({ success: false });
+    }
+  } catch (err) {
+    console.error(err);
+    return res.json({ success: false, message: 'Verification failed' });
+  }
 });
