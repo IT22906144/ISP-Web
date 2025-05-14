@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3d34ef;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .status-success {
+            color: rgb(0, 17, 128);
+            font-weight: bold;
+        }
+        .status-failed {
+            color: red;
+            font-weight: bold;
+        }
+        @media (max-width: 600px) {
+            table {
+                font-size: 14px;
+            }
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>User Login Data</h1>
+    <table id="loginTable">
+        <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Employee ID</th>
+                <th>Email</th>
+                <th>Login Date</th>
+                <th>Login Time</th>
+                <th>Login Status</th>
+            </tr>
+        </thead>
+        <tbody id="loginData">
+            <!-- Data will be populated by JavaScript -->
+        </tbody>
+    </table>
+
+    <script>
+        // Sample login data (replace with actual data source in production)
+        const loginData = [
+            {
+                userName: "Sudeepa Jayanath",
+                employeeId: "E001",
+                email: "test@gmail.com",
+                loginDate: "2025-05-13",
+                loginTime: "09:30 AM",
+                loginStatus: "Success"
+            },
+            {
+                userName: "Sudeepa Jayanath",
+                employeeId: "E001",
+                email: "test@gmail.com",
+                loginDate: "2025-05-14",
+                loginTime: "10:15 AM",
+                loginStatus: "Failed"
+            },
+            {
+                userName: "Nethmi Shehara",
+                employeeId: "E002",
+                email: "test01@gmail.com",
+                loginDate: "2025-05-13",
+                loginTime: "03:45 PM",
+                loginStatus: "Success"
+            }
+        ];
+
+        // Function to populate the table
+        function populateTable(data) {
+            const tbody = document.getElementById("loginData");
+            tbody.innerHTML = ""; // Clear existing data
+
+            data.forEach(entry => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${entry.userName}</td>
+                    <td>${entry.employeeId}</td>
+                    <td>${entry.email}</td>
+                    <td>${entry.loginDate}</td>
+                    <td>${entry.loginTime}</td>
+                    <td class="status-${entry.loginStatus.toLowerCase()}">${entry.loginStatus}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Initialize table with data
+        window.onload = () => populateTable(loginData);
+    </script>
+</body>
+</html>
