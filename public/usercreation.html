@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <link rel="stylesheet" href="/assets/css/style.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>User Registration</title>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -38,7 +37,7 @@
         </button>
       </div>
       <input type="hidden" id="fingerprintData" />
-      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700" onclick="location.href='adminask.html'">
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
         Create User
       </button>
       <div id="formAlert" class="hidden p-3 rounded text-sm"></div>
@@ -46,6 +45,7 @@
   </div>
 
   <script>
+    // Fingerprint Registration
     document.getElementById("registerFingerprint").addEventListener("click", async () => {
       try {
         const publicKey = {
@@ -66,19 +66,21 @@
         if (credential) {
           document.getElementById("fingerprintData").value = btoa(JSON.stringify(credential));
           document.getElementById("registerFingerprint").innerText = "🟢 Fingerprint Registered";
+          showAlert("Fingerprint registered successfully!", "success");
         }
       } catch (error) {
-        alert("Fingerprint registration failed.");
+        showAlert("Fingerprint registration failed.", "error");
       }
     });
 
+    // Form Submission
     document.getElementById("userForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const password = document.getElementById("password").value;
       const confirmPassword = document.getElementById("confirmPassword").value;
       if (password !== confirmPassword) {
-        alert("Passwords do not match!");
+        showAlert("Passwords do not match!", "error");
         return;
       }
 
@@ -97,7 +99,7 @@
       };
 
       try {
-        const res = await fetch("/register", {
+        const res = await fetch("http://localhost:5000/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
@@ -105,15 +107,31 @@
 
         const result = await res.json();
         if (res.ok) {
-          window.location.href = "adminask.html";
+          showAlert("User registered successfully!", "success");
+          setTimeout(() => {
+            window.location.href = "adminask.html";
+          }, 2000);
         } else {
-          alert(result.message || "Registration failed.");
+          showAlert(result.message || "Registration failed.", "error");
         }
       } catch (err) {
         console.error(err);
-        alert("Network error or server not running.");
+        showAlert("Network error or server not running.", "error");
       }
     });
+
+    // Alert Display Function
+    function showAlert(message, type) {
+      const alertDiv = document.getElementById("formAlert");
+      alertDiv.className = `p-3 rounded text-sm ${
+        type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+      }`;
+      alertDiv.innerText = message;
+      alertDiv.classList.remove("hidden");
+      setTimeout(() => {
+        alertDiv.classList.add("hidden");
+      }, 5000);
+    }
   </script>
 
   <style>
