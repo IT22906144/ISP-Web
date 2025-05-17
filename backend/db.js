@@ -1,6 +1,6 @@
 const { MongoClient } = require('mongodb');
 
-const uri = "mongodb+srv://sudeepait2002:MONGOsudeepa123@isp-db.yegzvnh.mongodb.net/?retryWrites=true&w=majority";
+const uri = "mongodb+srv://######:#######@isp-db.yegzvnh.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri);
 
 async function connectToDB() {
@@ -14,3 +14,5 @@ async function connectToDB() {
 }
 
 module.exports = connectToDB;
+
+//All the sensitive data removed

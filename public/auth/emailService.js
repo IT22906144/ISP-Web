@@ -7,10 +7,10 @@ let transporter;
 const initializeTransporter = () => {
   // Create transporter with email service configuration
   transporter = nodemailer.createTransport({
-    service: process.env.EMAIL_SERVICE, // 'gmail', 'outlook', etc.
+    service: process.env.EMAIL_SERVICE, 
     auth: {
-      user: process.env.EMAIL_USER,     // Your email address
-      pass: process.env.EMAIL_PASSWORD, // Your email password or app password
+      user: process.env.EMAIL_USER,     
+      pass: process.env.EMAIL_PASSWORD, 
     },
   });
   
@@ -27,9 +27,9 @@ const initializeTransporter = () => {
 // Alternative setup using SMTP directly (more customizable)
 const initializeSmtpTransporter = () => {
   transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,           // e.g., 'smtp.gmail.com'
-    port: process.env.SMTP_PORT,           // e.g., 587
-    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+    host: process.env.SMTP_HOST,          
+    port: process.env.SMTP_PORT,          
+    secure: process.env.SMTP_SECURE === 'true', 
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD,
