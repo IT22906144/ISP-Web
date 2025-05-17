@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>User Registration</title>
+  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -19,7 +20,7 @@
         <input type="tel" id="phone" placeholder="Phone*" required class="input" />
         <input type="email" id="email" placeholder="Email*" required class="input" />
         <input type="date" id="dob" required class="input" />
-        <select id="gender" required class="input">
+        <select id="gender" required class="input" style="color: black;">
           <option value="">Gender*</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
@@ -27,7 +28,7 @@
         </select>
         <input type="password" id="password" placeholder="Password*" required class="input" />
         <input type="password" id="confirmPassword" placeholder="Confirm Password*" required class="input" />
-        <select id="userType" required class="input">
+        <select id="userType" required class="input" style="color: black;">
           <option value="">User Type*</option>
           <option value="user">User</option>
           <option value="admin">Admin</option>
@@ -37,7 +38,7 @@
         </button>
       </div>
       <input type="hidden" id="fingerprintData" />
-      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700" onclick="location.href='adminask.html'">
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
         Create User
       </button>
       <div id="formAlert" class="hidden p-3 rounded text-sm"></div>
@@ -69,7 +70,7 @@
           showAlert("Fingerprint registered successfully!", "success");
         }
       } catch (error) {
-        showAlert("Fingerprint registration failed.", "error");
+        showAlert("Scaning Device Not Found.", "error");
       }
     });
 

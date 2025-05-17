@@ -18,15 +18,30 @@
         return;
       }
 
-      // Step 1: Fetch challenge from server
-      const challengeResponse = await fetch('/api/auth-challenge', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: localStorage.getItem("username") }) // store username in login step
-      });
-      const publicKey = await challengeResponse.json();
-
       try {
+        //Fetch challenge from server
+        const challengeResponse = await fetch('/api/webauthn/authenticate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: localStorage.getItem("username") })
+        });
+
+        if (!challengeResponse.ok) {
+          throw new Error('Failed to fetch authentication challenge');
+        }
+
+        const publicKey = await challengeResponse.json();
+
+        // Convert challenge and allowCredentials to correct format
+        publicKey.challenge = base64ToArrayBuffer(publicKey.challenge);
+        if (publicKey.allowCredentials) {
+          publicKey.allowCredentials = publicKey.allowCredentials.map(cred => ({
+            ...cred,
+            id: base64ToArrayBuffer(cred.id)
+          }));
+        }
+
+        //Get credential
         const credential = await navigator.credentials.get({ publicKey });
 
         const assertionResponse = {
@@ -36,13 +51,15 @@
             authenticatorData: arrayBufferToBase64(credential.response.authenticatorData),
             clientDataJSON: arrayBufferToBase64(credential.response.clientDataJSON),
             signature: arrayBufferToBase64(credential.response.signature),
-            userHandle: credential.response.userHandle ? arrayBufferToBase64(credential.response.userHandle) : null,
+            userHandle: credential.response.userHandle 
+              ? arrayBufferToBase64(credential.response.userHandle) 
+              : null,
           },
           type: credential.type,
         };
 
-        // Step 2: Send assertion to server for verification
-        const verifyResponse = await fetch('/api/verify-auth', {
+        //Verify assertion
+        const verifyResponse = await fetch('/api/webauthn/verify-assertion', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -56,16 +73,26 @@
           alert("Authentication successful!");
           window.location.href = 'token.html';
         } else {
-          alert("Authentication failed.");
+          alert("Authentication failed: " + result.message);
         }
       } catch (err) {
-        console.error(err);
-        alert("Authentication error.");
+        console.error('Authentication error:', err);
+        alert("Authentication error: " + err.message);
       }
     }
 
     function arrayBufferToBase64(buffer) {
       return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+    }
+
+    function base64ToArrayBuffer(base64) {
+      const binary = atob(base64);
+      const len = binary.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return bytes.buffer;
     }
   </script>
 </body>
