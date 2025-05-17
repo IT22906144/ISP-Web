@@ -8,10 +8,12 @@ const userSchema = new mongoose.Schema({
   phone: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   dob: { type: Date, required: true },
-  gender: { type: String, required: true, enum: ['male', 'female', 'other'] },
+  gender: { type: String, required: true },
   password: { type: String, required: true },
-  userType: { type: String, required: true, enum: ['user', 'admin'] },
+  userType: { type: String, required: true },
   fingerprintData: { type: String },
-}, { timestamps: true });
+  otp: { type: String },
+  otpExpires: { type: Date }
+});
 
 module.exports = mongoose.model('User', userSchema);

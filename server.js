@@ -4,6 +4,7 @@ const cors = require('cors');
 const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
 const path = require('path');
+const nodemailer = require('nodemailer');
 const User = require('./models/User');
 
 dotenv.config();
@@ -23,6 +24,24 @@ mongoose.connect(process.env.MONGO_URI, {
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
+// Email configuration
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+// Verify email configuration
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('Email service error:', error);
+  } else {
+    console.log('Email service is ready');
+  }
+});
+
 // Register Route
 app.post('/register', async (req, res) => {
   try {
@@ -40,21 +59,17 @@ app.post('/register', async (req, res) => {
       fingerprintData,
     } = req.body;
 
-    // Validate required fields
     if (!fullName || !username || !nic || !empId || !phone || !email || !dob || !gender || !password || !userType) {
       return res.status(400).json({ message: 'All required fields must be provided' });
     }
 
-    // Check if user already exists
     const existingUser = await User.findOne({ $or: [{ email }, { username }, { nic }, { empId }] });
     if (existingUser) {
       return res.status(400).json({ message: 'User with this email, username, NIC, or employee ID already exists' });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create new user
     const user = new User({
       fullName,
       username,
@@ -69,7 +84,6 @@ app.post('/register', async (req, res) => {
       fingerprintData,
     });
 
-    // Save user to database
     await user.save();
 
     res.status(201).json({ message: 'User registered successfully' });
@@ -79,10 +93,81 @@ app.post('/register', async (req, res) => {
   }
 });
 
+// Login Route
+app.post('/api/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ success: false, message: 'Email and password are required' });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'User not found' });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ success: false, message: 'Invalid password' });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    user.otp = otp;
+    user.otpExpires = otpExpires;
+    await user.save();
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Your OTP Code',
+      text: `Your OTP code is ${otp}. It is valid for 10 minutes.`
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.json({ success: true, message: 'OTP sent to your email' });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ success: false, message: `Server error: ${error.message}` });
+  }
+});
+
+// OTP Verification Route
+app.post('/api/verify-otp', async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ success: false, message: 'Email and OTP are required' });
+    }
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'User not found' });
+    }
+
+    if (user.otp !== otp || user.otpExpires < new Date()) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
+    }
+
+    user.otp = null;
+    user.otpExpires = null;
+    await user.save();
+
+    res.json({ success: true, message: 'Login successful' });
+  } catch (error) {
+    console.error('OTP verification error:', error);
+    res.status(500).json({ success: false, message: `Server error: ${error.message}` });
+  }
+});
+
 // Get All Users Route
 app.get('/users', async (req, res) => {
   try {
-    const users = await User.find({}, '-password -fingerprintData'); // Exclude sensitive fields
+    const users = await User.find({}, '-password -fingerprintData -otp -otpExpires');
     res.json(users);
   } catch (error) {
     console.error('Error fetching users:', error);
