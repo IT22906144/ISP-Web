@@ -4,80 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registered Users</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f4f4f4;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #3d34ef;
-            color: white;
-        }
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-        .error {
-            color: red;
-            text-align: center;
-            margin-top: 20px;
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Registered Users</h1>
-    <table id="usersTable">
-        <thead>
-            <tr>
-                <th>Full Name</th>
-                <th>Username</th>
-                <th>NIC</th>
-                <th>Employee ID</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>Gender</th>
-                <th>User Type</th>
-            </tr>
-        </thead>
-        <tbody id="usersBody">
-            <tr>
-                <td>Sudeepa Jayanath</td>
-                <td>sudeepa</td>
-                <td>20020099888</td>
-                <td>E001</td>
-                <td>0778889944</td>
-                <td>test@gmail.com</td>
-                <td>Male</td>
-                <td>User</td>
-            </tr>
-            <tr>
-                <td>Nethmi Shehara</td>
-                <td>nethmi</td>
-                <td>200255566999</td>
-                <td>E002</td>
-                <td>0778889944</td>
-                <td>test01@gmail.com</td>
-                <td>Female</td>
-                <td>User</td>
-            </tr>
-        </tbody>
-    </table>
-    <p id="error" class="error"></p>
+<body class="bg-gray-50 min-h-screen p-4">
+    <div class="max-w-5xl mx-auto">
+        <h1 class="text-3xl font-bold text-red text-center mb-6">Registered Users</h1>
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-blue-600 text-white">
+                        <th class="py-3 px-4 text-left">Full Name</th>
+                        <th class="py-3 px-4 text-left">Username</th>
+                        <th class="py-3 px-4 text-left">NIC</th>
+                        <th class="py-3 px-4 text-left">Employee ID</th>
+                        <th class="py-3 px-4 text-left">Phone</th>
+                        <th class="py-3 px-4 text-left">Email</th>
+                        <th class="py-3 px-4 text-left">Gender</th>
+                        <th class="py-3 px-4 text-left">User Type</th>
+                    </tr>
+                </thead>
+                <tbody id="usersBody" class="text-gray-700">
+                    <!-- Users will be populated dynamically -->
+                </tbody>
+            </table>
+        </div>
+        <p id="error" class="text-red-600 text-center mt-4 hidden"></p>
+        <a class="mt-6 inline-block bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700" onclick="location.href='usercreation.html'">Register New User</a>
+    </div>
+
+    <script>
+        // Fetch and display users
+        async function fetchUsers() {
+            try {
+                const response = await fetch('http://localhost:5000/users');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch users');
+                }
+                const users = await response.json();
+                populateTable(users);
+            } catch (error) {
+                showError('Error loading users: ' + error.message);
+            }
+        }
+
+        // Populate table with user data
+        function populateTable(users) {
+            const tbody = document.getElementById('usersBody');
+            tbody.innerHTML = ''; // Clear existing rows
+
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="py-3 px-4 text-center text-gray-500">No users found</td></tr>';
+                return;
+            }
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-100';
+                row.innerHTML = `
+                    <td class="py-3 px-4">${user.fullName}</td>
+                    <td class="py-3 px-4">${user.username}</td>
+                    <td class="py-3 px-4">${user.nic}</td>
+                    <td class="py-3 px-4">${user.empId}</td>
+                    <td class="py-3 px-4">${user.phone}</td>
+                    <td class="py-3 px-4">${user.email}</td>
+                    <td class="py-3 px-4">${user.gender.charAt(0).toUpperCase() + user.gender.slice(1)}</td>
+                    <td class="py-3 px-4">${user.userType.charAt(0).toUpperCase() + user.userType.slice(1)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorP = document.getElementById('error');
+            errorP.textContent = message;
+            errorP.classList.remove('hidden');
+        }
+
+        // Fetch users on page load
+        window.onload = fetchUsers;
+    </script>
 </body>
 </html>

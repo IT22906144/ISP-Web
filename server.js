@@ -79,6 +79,17 @@ app.post('/register', async (req, res) => {
   }
 });
 
+// Get All Users Route
+app.get('/users', async (req, res) => {
+  try {
+    const users = await User.find({}, '-password -fingerprintData'); // Exclude sensitive fields
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Error fetching users' });
+  }
+});
+
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
